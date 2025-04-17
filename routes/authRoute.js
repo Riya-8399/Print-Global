@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { signup, login, getProfile, updateProfile, } = require('../controllers/authController');
+const { signup, login, getProfile, updateProfile, deleteProfile, changePassword } = require('../controllers/authController');
 
-//const authMiddleware  = require('../middleware/authMiddleware');
+
 const  { authenticateUser } = require('../middleware/authMiddleware');
-const { deleteProfile } = require('../controllers/authController.js');
+// const { deleteProfile } = require('../controllers/authController.js');
 
 
 // Route for signup
@@ -21,6 +21,10 @@ router.put('/update-profile', authenticateUser , updateProfile);
 
 //Route for deleting profile
 router.delete('/delete-profile', authenticateUser, deleteProfile,);
+
+// Route for changing  password
+router.put('/change-password', authenticateUser, changePassword);
+
 
 module.exports = router;
 
