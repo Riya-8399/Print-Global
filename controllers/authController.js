@@ -51,6 +51,7 @@ const signup = async (req, res) => {
     }
 };
 
+//GetProfile
 const getProfile = async (req, res) => {
     console.log("Decoded token user info:", req.user); 
     try {
@@ -103,6 +104,28 @@ const updateProfile = async (req, res) => {
       res.status(500).json({ message: "Error updating profile", error });
     }
   };
+
   
 
-module.exports = { signup, login, getProfile, updateProfile};
+// Delete user profile
+const deleteProfile = async (req, res) => {
+  try {
+    // Find the user by ID and delete it
+    const user = await User.findByIdAndDelete(req.user.userId);  // Assuming user ID is saved in the token (middleware)
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({ message: 'User profile deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+
+  
+
+module.exports = { signup, login, getProfile, updateProfile, deleteProfile,};
