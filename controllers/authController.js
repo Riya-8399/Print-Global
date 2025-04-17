@@ -110,6 +110,8 @@ const updateProfile = async (req, res) => {
 // Delete user profile
 const deleteProfile = async (req, res) => {
   try {
+    const userId = req.userId; 
+
     // Find the user by ID and delete it
     const user = await User.findByIdAndDelete(req.user.userId);  // Assuming user ID is saved in the token (middleware)
 
@@ -119,8 +121,8 @@ const deleteProfile = async (req, res) => {
 
     res.status(200).json({ message: 'User profile deleted successfully' });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error deleting profile:", error);
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
 
