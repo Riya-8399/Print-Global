@@ -74,9 +74,6 @@ const getProfile = async (req, res) => {
 };
 
 //Update user profile
-// @desc   Update user profile
-// @route  PUT /api/auth/update-profile
-// @access Private
 const updateProfile = async (req, res) => {
     try {
       const userId = req.user.userId;
@@ -126,8 +123,39 @@ const deleteProfile = async (req, res) => {
   }
 };
 
+//  Change Password 
+const changePassword = async (req, res) => {
+    console.log("🧩 Token Decoded Info from Middleware:", req.user);
+    try {
+      const userId = req.userId;
+      const { oldPassword, newPassword } = req.body;
+  
+      // Step 1: Find the user
+      const user = await User.findById(req.user.userId);
+     
+      if (!user) return res.status(404).json({ message: "User not found" });
+  
+      // Step 2: Compare old password
+      const isPasswordMatch = await bcrypt.compare(oldPassword, user.password);
+      if (!isPasswordMatch) {
+        return res.status(400).json({ message: "Old password is incorrect" });
+      }
+  
+      // Step 3: Hash new password & update
+      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+      user.password = hashedNewPassword;
+      await user.save();
+  
+      res.status(200).json({ message: "Password changed successfully" });
+    } catch (error) {
+      console.error("Change password error:", error);
+      res.status(500).json({ message: "Something went wrong" });
+    }
+  };
+  
+
 
 
   
 
-module.exports = { signup, login, getProfile, updateProfile, deleteProfile,};
+module.exports = { signup, login, getProfile, updateProfile, deleteProfile, changePassword,} ;
