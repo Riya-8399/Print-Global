@@ -15,6 +15,10 @@ const login = async (req, res) => {
 
         // 2. Compare passwords
         const isMatch = await bcrypt.compare(password, user.password);
+
+        
+console.log("login hashed password:", );//
+
         if (!isMatch) {
             return res.status(400).json({ message: "Invalid credentials" });
         }
@@ -153,9 +157,83 @@ const changePassword = async (req, res) => {
     }
   };
   
+  const crypto = require('crypto');
 
+//FORGOT PASSWORD HANDLER
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
 
+  try {
+    // 1. Check if user exists
+    const user = await User.findOne({ email });
 
+    if (!user) {
+      return res.status(404).json({ message: 'User with this email not found' });
+    }
+
+    // 2. Generate a random token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+
+    // 3. Set token and expiry on user document
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+
+    await user.save();
+
+    // 4. Simulate email sending (we'll log it to console for now)
+    const resetUrl = `http://localhost:5000/api/auth/reset-password/${resetToken}`;
+    console.log(`🔗 Password reset link: ${resetUrl}`);
+
+    res.status(200).json({
+      message: 'Password reset link sent (check your console 💌)',
+    });
+  } catch (error) {
+    console.error('Forgot Password Error:', error);
+    res.status(500).json({ message: 'Something went wrong' });
+  }
+};
+//RESET PASSWORD
+const resetPassword = async (req, res) => {
+    try {
+      const { token } = req.params;
+      const { newPassword } = req.body;
+  
+    
+
+      // Find user with valid token that hasn't expired
+      let user = await User.findOne({
+        resetPasswordToken: token,
+        resetPasswordExpires: { $gt: Date.now() }, // Check if token is still valid
+      });
+  
+      if (!user) {
+        
+        return res.status(400).json({ message: "Invalid or expired token" });
+      }
+     
+  
+      // Hash the new password before saving
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+       // Log the hashed password to ensure it's hashed properly
+       console.log("🔐 Hashed password:", hashedPassword); //remove if doesnt work
+  
+      user.password = hashedPassword;
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+  
+      // const u = await user.save();
+       const u = await User.updateOne({email: user.email},{password: hashedPassword});
+       console.log("u is[------------------->" , u); 
+      
+      res.status(200).json({ message: "Password reset successful" });
+    } catch (error) {
+      console.log("❌ Error resetting password:", error);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  };
   
 
-module.exports = { signup, login, getProfile, updateProfile, deleteProfile, changePassword,} ;
+
+module.exports = { signup, login, getProfile, updateProfile, deleteProfile, changePassword, forgotPassword,
+    resetPassword, } ;
