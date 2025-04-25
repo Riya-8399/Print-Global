@@ -1,6 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+
+
+
 // require('dotenv').config(); // to load the .env file
 
 const app = express();
@@ -12,8 +15,13 @@ app.use(express.json());
 
 // Import routes
 const authRoutes = require('./routes/authRoute');
+const imageRoutes = require('./routes/imageRoutes');
+
 // Use routes
 app.use('/api/auth', authRoutes);
+app.use('/api/image', imageRoutes);
+
+
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
@@ -33,5 +41,7 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
     console.log(`🟢 Server is running on http://localhost:${PORT}`);
 });
+
+
 
 

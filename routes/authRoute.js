@@ -4,6 +4,8 @@ const { signup, login, getProfile, updateProfile, deleteProfile, changePassword,
     resetPassword } = require('../controllers/authController');
 
 
+
+
 const  { authenticateUser } = require('../middleware/authMiddleware');
 // const { deleteProfile } = require('../controllers/authController.js');
 
@@ -31,7 +33,8 @@ router.post('/forgot-password', forgotPassword);
 router.post("/reset-password/:token", resetPassword);
 
 
-module.exports = router;
+
+
 
 
 
